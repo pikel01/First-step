@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hello App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+    }
 
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      min-height: 24px;
+      white-space: pre-wrap;
+    }
+
+    .error {
+      color: #b00020;
+    }
+
+    .success {
+      color: #0a7d20;
+    }
+  </style>
+</head>
+<body>
+  <h1>Введите текст</h1>
+
+  <input id="textInput" type="text" placeholder="Введите hello" />
+  <button id="sendButton">Отправить</button>
+
+  <div id="result"></div>
+
+  <script>
+    const input = document.getElementById("textInput");
+    const button = document.getElementById("sendButton");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", async () => {
+      const text = input.value.trim();
+
+      result.textContent = "Загрузка...";
+      result.className = "";
+
+      try {
+        const response = await fetch("/api/check", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text: text })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || "Ошибка";
+          result.className = "error";
+          return;
+        }
+
+        result.textContent = data.result;
+        result.className = "success";
+      } catch (e) {
+        result.textContent = "Ошибка сети или сервера";
+        result.className = "error";
+      }
+    });
+  </script>
+</body>
+</html>
